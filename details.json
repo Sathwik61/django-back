@@ -1,0 +1,182 @@
+{
+  "80": {
+    "vulnerability": "HTTP",
+    "disadvantage": "Lack of encryption allows attackers to intercept and modify data.",
+    "solution": "Use HTTPS to encrypt the communication and prevent man-in-the-middle attacks.",
+    "usage": "Used for unencrypted web traffic (HTTP)."
+  },
+  "443": {
+    "vulnerability": "SSL/TLS weaknesses",
+    "disadvantage": "Weak SSL/TLS configurations can expose the system to downgrade attacks and other vulnerabilities.",
+    "solution": "Ensure strong SSL/TLS protocols and configurations are used, such as using TLS 1.2 or higher.",
+    "usage": "Used for encrypted web traffic (HTTPS)."
+  },
+  "21": {
+    "vulnerability": "FTP (File Transfer Protocol)",
+    "disadvantage": "Transmits data in plaintext, making it vulnerable to interception.",
+    "solution": "Use FTPS or SFTP for secure file transfer, as they encrypt the data.",
+    "usage": "Used for transferring files between systems (FTP)."
+  },
+  "23": {
+    "vulnerability": "Telnet",
+    "disadvantage": "Transmits data, including login credentials, in plaintext.",
+    "solution": "Use SSH for secure remote access instead of Telnet.",
+    "usage": "Used for remote access to systems (Telnet)."
+  },
+  "3306": {
+    "vulnerability": "MySQL default configuration",
+    "disadvantage": "Default MySQL configurations can expose the database to brute force attacks.",
+    "solution": "Change default passwords, use firewalls to limit access, and implement strong authentication.",
+    "usage": "Used by MySQL databases for client-server communication."
+  },
+  "1433": {
+    "vulnerability": "Microsoft SQL Server",
+    "disadvantage": "Exposes the database to SQL injection and brute force attacks.",
+    "solution": "Configure strong authentication, use firewalls, and enable encryption for data transmission.",
+    "usage": "Used by Microsoft SQL Server for client-server communication."
+  },
+  "8080": {
+    "vulnerability": "Default HTTP Proxy",
+    "disadvantage": "Can be used for unauthorized access to network resources.",
+    "solution": "Disable the proxy or restrict access to it using authentication and firewall rules.",
+    "usage": "Common alternative port for HTTP traffic (HTTP proxy)."
+  },
+  "22": {
+    "vulnerability": "SSH",
+    "disadvantage": "Potential for brute force attacks or unauthorized access if weak passwords or default configurations are used.",
+    "solution": "Use key-based authentication and disable password authentication. Limit access using firewalls.",
+    "usage": "Used for secure remote access (SSH)."
+  },
+  "53": {
+    "vulnerability": "DNS",
+    "disadvantage": "DNS poisoning attacks can mislead users to malicious websites.",
+    "solution": "Use DNSSEC to ensure integrity of DNS responses and restrict DNS queries to trusted servers.",
+    "usage": "Used for domain name resolution (DNS)."
+  },
+  "110": {
+    "vulnerability": "POP3 (Post Office Protocol v3)",
+    "disadvantage": "Transmits email content in plaintext, making it vulnerable to interception.",
+    "solution": "Use POP3S (POP3 Secure) or IMAPS for encrypted email transmission.",
+    "usage": "Used to retrieve emails from a mail server (POP3)."
+  },
+  "143": {
+    "vulnerability": "IMAP (Internet Message Access Protocol)",
+    "disadvantage": "Transmits email content in plaintext, making it vulnerable to interception.",
+    "solution": "Use IMAPS for encrypted email transmission.",
+    "usage": "Used for email retrieval from mail servers (IMAP)."
+  },
+  "25": {
+    "vulnerability": "SMTP (Simple Mail Transfer Protocol)",
+    "disadvantage": "Can be exploited for spam and email spoofing if not secured.",
+    "solution": "Use SMTPS (SMTP Secure) for encrypted email transmission and implement authentication mechanisms.",
+    "usage": "Used for sending email (SMTP)."
+  },
+  "3389": {
+    "vulnerability": "RDP (Remote Desktop Protocol)",
+    "disadvantage": "Can be targeted by brute force attacks to gain unauthorized remote access.",
+    "solution": "Use a VPN for secure RDP access and implement account lockout policies.",
+    "usage": "Used for remote desktop access (RDP)."
+  },
+  "514": {
+    "vulnerability": "Syslog",
+    "disadvantage": "Logs can be easily intercepted and modified if transmitted in plaintext.",
+    "solution": "Use TLS encryption for Syslog messages to prevent interception and tampering.",
+    "usage": "Used for sending system log messages (Syslog)."
+  },
+  "135": {
+    "vulnerability": "Microsoft RPC (Remote Procedure Call)",
+    "disadvantage": "Exposes sensitive data and allows attackers to execute arbitrary code remotely.",
+    "solution": "Use firewalls to block unnecessary RPC ports and configure access controls.",
+    "usage": "Used by Microsoft systems for remote procedure calls (RPC)."
+  },
+  "69": {
+    "vulnerability": "TFTP (Trivial File Transfer Protocol)",
+    "disadvantage": "No authentication, allows file transfers in a highly insecure manner.",
+    "solution": "Avoid using TFTP for sensitive data; consider FTP or SFTP for secure transfers.",
+    "usage": "Used for transferring files without authentication (TFTP)."
+  },
+  "2049": {
+    "vulnerability": "NFS (Network File System)",
+    "disadvantage": "Can allow unauthorized access to shared files and folders.",
+    "solution": "Use secure NFS configurations with proper authentication mechanisms and firewalls.",
+    "usage": "Used for file sharing over a network (NFS)."
+  },
+  "161": {
+    "vulnerability": "SNMP (Simple Network Management Protocol)",
+    "disadvantage": "Weak SNMP community strings can allow attackers to gain sensitive system information.",
+    "solution": "Use SNMPv3 with strong encryption and authentication for secure management.",
+    "usage": "Used for network device management (SNMP)."
+  },
+  "1099": {
+    "vulnerability": "RMI (Remote Method Invocation)",
+    "disadvantage": "Can be exploited by attackers to remotely invoke methods on Java-based systems.",
+    "solution": "Use firewalls to block RMI ports and implement strict authentication mechanisms.",
+    "usage": "Used for Java-based remote method invocation (RMI)."
+  },
+  "6379": {
+    "vulnerability": "Redis",
+    "disadvantage": "Exposes the server to remote code execution and data theft.",
+    "solution": "Bind Redis to localhost or configure strong authentication and firewall rules.",
+    "usage": "Used by Redis database for client-server communication."
+  },
+  "5900": {
+    "vulnerability": "VNC (Virtual Network Computing)",
+    "disadvantage": "Can be exploited for unauthorized access to desktop environments.",
+    "solution": "Use strong passwords and encrypt VNC traffic with SSH or SSL/TLS.",
+    "usage": "Used for remote access to graphical desktops (VNC)."
+  },
+  "8000": {
+    "vulnerability": "Common HTTP port for web applications",
+    "disadvantage": "Can expose web applications to unauthorized access if not secured.",
+    "solution": "Use HTTPS for encryption and ensure web applications are patched regularly.",
+    "usage": "Commonly used by web applications for HTTP traffic (alternative to port 80)."
+  },
+  "9999": {
+    "vulnerability": "Miscellaneous ports used by various services",
+    "disadvantage": "Often targeted due to poor security configurations.",
+    "solution": "Restrict access using firewalls and use strong authentication mechanisms.",
+    "usage": "Used by various services, often in development or testing environments."
+  },
+  "5432": {
+    "vulnerability": "PostgreSQL Database",
+    "disadvantage": "Exposes the database to SQL injection and brute force attacks.",
+    "solution": "Configure strong authentication, use firewalls, and enable encryption for data transmission.",
+    "usage": "Used by PostgreSQL databases for client-server communication."
+  },
+  "636": {
+    "vulnerability": "LDAPS (Secure LDAP)",
+    "disadvantage": "Weak or outdated LDAP configurations can expose sensitive data.",
+    "solution": "Use strong encryption and authentication methods for LDAP communications.",
+    "usage": "Used for secure LDAP communications (LDAPS)."
+  },
+  "9200": {
+    "vulnerability": "Elasticsearch",
+    "disadvantage": "Exposes data to unauthorized access and potential attacks if misconfigured.",
+    "solution": "Secure Elasticsearch with firewalls, authentication, and encryption.",
+    "usage": "Used by Elasticsearch for distributed search and analytics."
+  },
+  "5000": {
+    "vulnerability": "Flask (Default development server)",
+    "disadvantage": "Running Flask in production without proper security measures exposes applications to attacks.",
+    "solution": "Use production-ready servers like Gunicorn or uWSGI, and secure the application with proper configurations.",
+    "usage": "Default development server for Flask web applications."
+  },
+  "8081": {
+    "vulnerability": "HTTP Proxy (Alternative)",
+    "disadvantage": "Can be used for unauthorized access to network resources.",
+    "solution": "Disable the proxy or restrict access to it using authentication and firewall rules.",
+    "usage": "Common alternative port for HTTP proxy traffic."
+  },
+  "8888": {
+    "vulnerability": "Jupyter Notebooks",
+    "disadvantage": "Exposes sensitive data and notebooks if not secured.",
+    "solution": "Use password protection, token-based authentication, and SSL for secure Jupyter notebook access.",
+    "usage": "Used for accessing Jupyter Notebooks."
+  },
+  "27017": {
+    "vulnerability": "MongoDB Database",
+    "disadvantage": "Exposes the database to unauthorized access if not secured.",
+    "solution": "Configure firewalls, authentication, and encryption to secure MongoDB instances.",
+    "usage": "Used by MongoDB databases for client-server communication."
+  }
+}

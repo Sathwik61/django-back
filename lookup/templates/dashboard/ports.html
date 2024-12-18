@@ -1,0 +1,293 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Dashboard - Port Scanner{% endblock %}
+
+{% block header %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center">
+    <div class="bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
+        <h1 class="text-2xl font-bold mb-4 text-center">Port Scanner</h1>
+        <form id="port-scanner-form" class="space-y-4">
+            {% csrf_token %}
+            <label class="block">
+                <span class="text-gray-300">Enter Hostname / IP:</span>
+                <input type="text" name="hostname" required class="mt-1 block w-full bg-gray-700 text-white rounded-md border-gray-600 focus:ring-blue-500 focus:border-blue-500">
+            </label>
+
+            <label class="block">
+                <span class="text-gray-300">Select Scanning Option:</span>
+                <select name="scan_option" class="mt-1 block w-full bg-gray-700 text-white rounded-md border-gray-600 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="all">Scan All Ports</option>
+                    <option value="range">Scan Range of Ports</option>
+                    <option value="selected">Scan Selected Ports</option>
+                </select>
+            </label>
+
+            <div id="port-range" class="hidden">
+                <label class="block">
+                    <span class="text-gray-300">Port Range (e.g., 20-80):</span>
+                    <input type="text" name="port_range" class="mt-1 block w-full bg-gray-700 text-white rounded-md border-gray-600 focus:ring-blue-500 focus:border-blue-500">
+                </label>
+            </div>
+
+            <div id="selected-ports" class="hidden">
+                <label class="block">
+                    <span class="text-gray-300">Selected Ports (comma-separated):</span>
+                    <input type="text" name="selected_ports" class="mt-1 block w-full bg-gray-700 text-white rounded-md border-gray-600 focus:ring-blue-500 focus:border-blue-500">
+                </label>
+            </div>
+
+            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded w-full relative">
+                <span id="loader" class="hidden absolute left-4 top-1/2 transform -translate-y-1/2 spinner"></span>
+                <span>Scan Ports</span>
+            </button>
+        </form>
+
+        <div id="result" class="mt-4 text-white"></div>
+    </div>
+
+    <script>
+        const scanOption = document.querySelector('select[name="scan_option"]');
+        const portRange = document.getElementById('port-range');
+        const selectedPorts = document.getElementById('selected-ports');
+        const form = document.getElementById('port-scanner-form');
+        const resultDiv = document.getElementById('result');
+        const loader = document.getElementById('loader');
+
+        const portVulnerabilities = {
+  "80": {
+    "vulnerability": "HTTP",
+    "disadvantage": "Lack of encryption allows attackers to intercept and modify data.",
+    "solution": "Use HTTPS to encrypt the communication and prevent man-in-the-middle attacks.",
+    "usage": "Used for unencrypted web traffic (HTTP)."
+  },
+  "443": {
+    "vulnerability": "SSL/TLS weaknesses",
+    "disadvantage": "Weak SSL/TLS configurations can expose the system to downgrade attacks and other vulnerabilities.",
+    "solution": "Ensure strong SSL/TLS protocols and configurations are used, such as using TLS 1.2 or higher.",
+    "usage": "Used for encrypted web traffic (HTTPS)."
+  },
+  "21": {
+    "vulnerability": "FTP (File Transfer Protocol)",
+    "disadvantage": "Transmits data in plaintext, making it vulnerable to interception.",
+    "solution": "Use FTPS or SFTP for secure file transfer, as they encrypt the data.",
+    "usage": "Used for transferring files between systems (FTP)."
+  },
+  "23": {
+    "vulnerability": "Telnet",
+    "disadvantage": "Transmits data, including login credentials, in plaintext.",
+    "solution": "Use SSH for secure remote access instead of Telnet.",
+    "usage": "Used for remote access to systems (Telnet)."
+  },
+  "3306": {
+    "vulnerability": "MySQL default configuration",
+    "disadvantage": "Default MySQL configurations can expose the database to brute force attacks.",
+    "solution": "Change default passwords, use firewalls to limit access, and implement strong authentication.",
+    "usage": "Used by MySQL databases for client-server communication."
+  },
+  "1433": {
+    "vulnerability": "Microsoft SQL Server",
+    "disadvantage": "Exposes the database to SQL injection and brute force attacks.",
+    "solution": "Configure strong authentication, use firewalls, and enable encryption for data transmission.",
+    "usage": "Used by Microsoft SQL Server for client-server communication."
+  },
+  "8080": {
+    "vulnerability": "Default HTTP Proxy",
+    "disadvantage": "Can be used for unauthorized access to network resources.",
+    "solution": "Disable the proxy or restrict access to it using authentication and firewall rules.",
+    "usage": "Common alternative port for HTTP traffic (HTTP proxy)."
+  },
+  "22": {
+    "vulnerability": "SSH",
+    "disadvantage": "Potential for brute force attacks or unauthorized access if weak passwords or default configurations are used.",
+    "solution": "Use key-based authentication and disable password authentication. Limit access using firewalls.",
+    "usage": "Used for secure remote access (SSH)."
+  },
+  "53": {
+    "vulnerability": "DNS",
+    "disadvantage": "DNS poisoning attacks can mislead users to malicious websites.",
+    "solution": "Use DNSSEC to ensure integrity of DNS responses and restrict DNS queries to trusted servers.",
+    "usage": "Used for domain name resolution (DNS)."
+  },
+  "110": {
+    "vulnerability": "POP3 (Post Office Protocol v3)",
+    "disadvantage": "Transmits email content in plaintext, making it vulnerable to interception.",
+    "solution": "Use POP3S (POP3 Secure) or IMAPS for encrypted email transmission.",
+    "usage": "Used to retrieve emails from a mail server (POP3)."
+  },
+  "143": {
+    "vulnerability": "IMAP (Internet Message Access Protocol)",
+    "disadvantage": "Transmits email content in plaintext, making it vulnerable to interception.",
+    "solution": "Use IMAPS for encrypted email transmission.",
+    "usage": "Used for email retrieval from mail servers (IMAP)."
+  },
+  "25": {
+    "vulnerability": "SMTP (Simple Mail Transfer Protocol)",
+    "disadvantage": "Can be exploited for spam and email spoofing if not secured.",
+    "solution": "Use SMTPS (SMTP Secure) for encrypted email transmission and implement authentication mechanisms.",
+    "usage": "Used for sending email (SMTP)."
+  },
+  "3389": {
+    "vulnerability": "RDP (Remote Desktop Protocol)",
+    "disadvantage": "Can be targeted by brute force attacks to gain unauthorized remote access.",
+    "solution": "Use a VPN for secure RDP access and implement account lockout policies.",
+    "usage": "Used for remote desktop access (RDP)."
+  },
+  "514": {
+    "vulnerability": "Syslog",
+    "disadvantage": "Logs can be easily intercepted and modified if transmitted in plaintext.",
+    "solution": "Use TLS encryption for Syslog messages to prevent interception and tampering.",
+    "usage": "Used for sending system log messages (Syslog)."
+  },
+  "135": {
+    "vulnerability": "Microsoft RPC (Remote Procedure Call)",
+    "disadvantage": "Exposes sensitive data and allows attackers to execute arbitrary code remotely.",
+    "solution": "Use firewalls to block unnecessary RPC ports and configure access controls.",
+    "usage": "Used by Microsoft systems for remote procedure calls (RPC)."
+  },
+  "69": {
+    "vulnerability": "TFTP (Trivial File Transfer Protocol)",
+    "disadvantage": "No authentication, allows file transfers in a highly insecure manner.",
+    "solution": "Avoid using TFTP for sensitive data; consider FTP or SFTP for secure transfers.",
+    "usage": "Used for transferring files without authentication (TFTP)."
+  },
+  "2049": {
+    "vulnerability": "NFS (Network File System)",
+    "disadvantage": "Can allow unauthorized access to shared files and folders.",
+    "solution": "Use secure NFS configurations with proper authentication mechanisms and firewalls.",
+    "usage": "Used for file sharing over a network (NFS)."
+  },
+  "161": {
+    "vulnerability": "SNMP (Simple Network Management Protocol)",
+    "disadvantage": "Weak SNMP community strings can allow attackers to gain sensitive system information.",
+    "solution": "Use SNMPv3 with strong encryption and authentication for secure management.",
+    "usage": "Used for network device management (SNMP)."
+  },
+  "1099": {
+    "vulnerability": "RMI (Remote Method Invocation)",
+    "disadvantage": "Can be exploited by attackers to remotely invoke methods on Java-based systems.",
+    "solution": "Use firewalls to block RMI ports and implement strict authentication mechanisms.",
+    "usage": "Used for Java-based remote method invocation (RMI)."
+  },
+  "6379": {
+    "vulnerability": "Redis",
+    "disadvantage": "Exposes the server to remote code execution and data theft.",
+    "solution": "Bind Redis to localhost or configure strong authentication and firewall rules.",
+    "usage": "Used by Redis database for client-server communication."
+  },
+  "5900": {
+    "vulnerability": "VNC (Virtual Network Computing)",
+    "disadvantage": "Can be exploited for unauthorized access to desktop environments.",
+    "solution": "Use strong passwords and encrypt VNC traffic with SSH or SSL/TLS.",
+    "usage": "Used for remote access to graphical desktops (VNC)."
+  },
+  "8000": {
+    "vulnerability": "Common HTTP port for web applications",
+    "disadvantage": "Can expose web applications to unauthorized access if not secured.",
+    "solution": "Use HTTPS for encryption and ensure web applications are patched regularly.",
+    "usage": "Commonly used by web applications for HTTP traffic (alternative to port 80)."
+  },
+  "9999": {
+    "vulnerability": "Miscellaneous ports used by various services",
+    "disadvantage": "Often targeted due to poor security configurations.",
+    "solution": "Restrict access using firewalls and use strong authentication mechanisms.",
+    "usage": "Used by various services, often in development or testing environments."
+  }
+}
+;
+
+        scanOption.addEventListener('change', () => {
+            portRange.classList.add('hidden');
+            selectedPorts.classList.add('hidden');
+
+            if (scanOption.value === 'range') {
+                portRange.classList.remove('hidden');
+            } else if (scanOption.value === 'selected') {
+                selectedPorts.classList.remove('hidden');
+            }
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            loader.classList.remove('hidden');
+            resultDiv.textContent = '';
+
+            const hostname = form.querySelector('input[name="hostname"]').value;
+            if (!hostname) {
+                resultDiv.innerHTML = `<p class="text-red-500">Hostname is required.</p>`;
+                loader.classList.add('hidden');
+                return;
+            }
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch("{% url 'ports' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': data['csrfmiddlewaretoken'],
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        hostname: data['hostname'],
+                        scan_option: data['scan_option'],
+                        port_range: data['port_range'],
+                        selected_ports: data['selected_ports'],
+                    }),
+                });
+
+                const result = await response.json();
+                loader.classList.add('hidden');
+
+                if (result.status === 'success') {
+                    resultDiv.innerHTML = `<h3 class="text-green-500 font-bold">Open Ports:</h3><ul class="list-disc list-inside text-white">`;
+
+                    result.open_ports.forEach(port => {
+                        const vulnerabilityInfo = portVulnerabilities[port];
+                        resultDiv.innerHTML += `
+                            <li>
+                                <strong>Port ${port}</strong><br>
+                                <div class="bg-gray-700 p-4 rounded-lg mt-2">
+                                    <p><strong>Vulnerability:</strong> ${vulnerabilityInfo.vulnerability}</p>
+                                    <p><strong>Usage:</strong> ${vulnerabilityInfo.usage}</p>
+                                    <p><strong>Disadvantage:</strong> ${vulnerabilityInfo.disadvantage}</p>
+                                    <p><strong>Solution:</strong> ${vulnerabilityInfo.solution}</p>
+                                </div>
+                            </li>`;
+                    });
+
+                    resultDiv.innerHTML += '</ul>';
+                } else {
+                    resultDiv.innerHTML = `<p class="text-red-500">${result.message}</p>`;
+                }
+            } catch (error) {
+                loader.classList.add('hidden');
+                resultDiv.innerHTML = `<p class="text-red-500">An error occurred: ${error.message}</p>`;
+            }
+        });
+    </script>
+
+    <style>
+        .spinner {
+            border: 4px solid transparent;
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</div>
+
+{% endblock %}
+

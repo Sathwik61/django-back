@@ -1,0 +1,39 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Dashboard - Port Scanner{% endblock %}
+
+{% block header %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6">Port Vulnerabilities</h1>
+    <div class="overflow-x-auto shadow-md rounded-lg">
+        <table class="min-w-full table-auto bg-white border-collapse">
+            <thead class="bg-gray-100 text-gray-700">
+                <tr>
+                    <th class="px-4 py-2 border-b">Port</th>
+                    <th class="px-4 py-2 border-b">Vulnerability</th>
+                    <th class="px-4 py-2 border-b">Disadvantage</th>
+                    <th class="px-4 py-2 border-b">Solution</th>
+                    <th class="px-4 py-2 border-b">Usage</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-700">
+                {% for port, details in data.items %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2 border-b">{{ port }}</td>
+                    <td class="px-4 py-2 border-b">{{ details.vulnerability|default:"Not specified" }}</td>
+                    <td class="px-4 py-2 border-b">{{ details.disadvantage|default:"Not specified" }}</td>
+                    <td class="px-4 py-2 border-b">{{ details.solution|default:"Not specified" }}</td>
+                    <td class="px-4 py-2 border-b">{{ details.usage|default:"Not specified" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center px-4 py-2">No data available</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

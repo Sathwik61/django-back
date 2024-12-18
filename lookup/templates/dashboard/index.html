@@ -1,0 +1,25 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Dashboard - Home{% endblock %}
+
+{% block header %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Card 1 -->
+    <div class="bg-white shadow p-6 rounded-lg">
+        <h3 class="text-lg font-semibold">Users</h3>
+        <p class="text-gray-600">Total: 120</p>
+    </div>
+    <!-- Card 2 -->
+    <div class="bg-white shadow p-6 rounded-lg">
+        <h3 class="text-lg font-semibold">Revenue</h3>
+        <p class="text-gray-600">$45,000</p>
+    </div>
+    <!-- Card 3 -->
+    <div class="bg-white shadow p-6 rounded-lg">
+        <h3 class="text-lg font-semibold">Performance</h3>
+        <p class="text-gray-600">75%</p>
+    </div>
+</div>
+{% endblock %}

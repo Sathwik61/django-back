@@ -1,0 +1,56 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Dashboard - Lookup{% endblock %}
+
+{% block header %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100">
+    <div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-md">
+        <h1 class="text-2xl font-bold text-gray-800 text-center mb-6">IP/URL Lookup</h1>
+        <form method="post" class="mb-4">
+            {% csrf_token %}
+            <div class="flex items-center gap-4">
+                <input 
+                    type="text" 
+                    name="ip_or_url" 
+                    placeholder="Enter IP or URL" 
+                    class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    required>
+                <button 
+                    type="submit" 
+                    class="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600">
+                    Search
+                </button>
+            </div>
+        </form>
+        {% if error %}
+            <div class="text-red-600 mt-4">{{ error }}</div>
+        {% endif %}
+        {% if data %}
+            <div class="mt-6">
+                <h2 class="text-lg font-bold text-gray-700">Results:</h2>
+                <ul class="mt-4 space-y-2">
+                    <li><strong>IP:</strong> {{ data.ip }}</li>
+                    <li><strong>Nation:</strong> {{ data.nation }}</li>
+                    <li><strong>Nation Code:</strong> {{ data.nation_code }}</li>
+                    <li><strong>Region Code:</strong> {{ data.region_code }}</li>
+                    <li><strong>Region Name:</strong> {{ data.region_name }}</li>
+                    <li><strong>City:</strong> {{ data.city }}</li>
+                    <li><strong>Timezone:</strong> {{ data.timezone }}</li>
+                    <li><strong>ISP:</strong> {{ data.isp }}</li>
+                    <li><strong>Organization:</strong> {{ data.org }}</li>
+                    <li><strong>AS:</strong> {{ data.as }}</li>
+                    <li><strong>Latitude:</strong> {{ data.lat }}</li>
+                    <li><strong>Longitude:</strong> {{ data.lon }}</li>
+                    <li><strong>ZIP Code:</strong> {{ data.zip }}</li>
+                    <li><strong>Google Maps:</strong> 
+                        <a href="{{ data.google_maps }}" target="_blank" class="text-blue-500 underline">View Location</a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
